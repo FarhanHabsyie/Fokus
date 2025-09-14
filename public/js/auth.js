@@ -1,108 +1,72 @@
-// Modul autentikasi: login, register, logout
+// ... (kode auth.js yang sudah ada)
 
-const loginBtn = document.getElementById('login-btn');
-const registerBtn = document.getElementById('register-btn');
-const loginModal = document.getElementById('login-modal');
-const registerModal = document.getElementById('register-modal');
-const loginClose = document.getElementById('login-close');
-const registerClose = document.getElementById('register-close');
-const switchToRegister = document.getElementById('switch-to-register');
-const switchToLogin = document.getElementById('switch-to-login');
-
-loginBtn.addEventListener('click', () => {
-  loginModal.classList.add('active');
-});
-
-registerBtn.addEventListener('click', () => {
-  registerModal.classList.add('active');
-});
-
-loginClose.addEventListener('click', () => {
-  loginModal.classList.remove('active');
-});
-
-registerClose.addEventListener('click', () => {
-  registerModal.classList.remove('active');
-});
-
-switchToRegister.addEventListener('click', (e) => {
+// Tambahkan atau modifikasi bagian ini di dalam event listener loginForm
+loginForm.addEventListener('submit', async (e) => {
   e.preventDefault();
-  loginModal.classList.remove('active');
-  registerModal.classList.add('active');
+  // ... (kode untuk mengambil email dan password)
+
+  try {
+    const response = await fetch('http://localhost:4000/login', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ email, password }),
+    });
+
+    const data = await response.json();
+
+    if (response.ok) {
+      localStorage.setItem('token', data.token);
+      localStorage.setItem('user', JSON.stringify(data));
+      
+      // Tampilkan tombol admin dan sembunyikan tombol login/daftar
+      document.getElementById('admin-btn').style.display = 'block';
+      document.getElementById('login-btn').style.display = 'none';
+      document.getElementById('register-btn').style.display = 'none';
+      
+      // Tambahkan tombol logout
+      const userActions = document.querySelector('.user-actions');
+      const logoutBtn = document.createElement('button');
+      logoutBtn.className = 'btn btn-outline';
+      logoutBtn.id = 'logout-btn';
+      logoutBtn.textContent = 'Logout';
+      logoutBtn.addEventListener('click', () => {
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        window.location.reload();
+      });
+      userActions.appendChild(logoutBtn);
+
+      // Tutup modal
+      document.getElementById('login-modal').style.display = 'none';
+
+    } else {
+      alert(data.error);
+    }
+  } catch (error) {
+    console.error('Login error:', error);
+  }
 });
 
-switchToLogin.addEventListener('click', (e) => {
-  e.preventDefault();
-  registerModal.classList.remove('active');
-  loginModal.classList.add('active');
-});
+// Cek status login saat halaman dimuat
+document.addEventListener('DOMContentLoaded', () => {
+  const token = localStorage.getItem('token');
+  if (token) {
+    document.getElementById('admin-btn').style.display = 'block';
+    document.getElementById('login-btn').style.display = 'none';
+    document.getElementById('register-btn').style.display = 'none';
 
-// Close modal when clicking outside
-window.addEventListener('click', (e) => {
-  if (e.target === loginModal) {
-    loginModal.classList.remove('active');
+    const userActions = document.querySelector('.user-actions');
+    const logoutBtn = document.createElement('button');
+    logoutBtn.className = 'btn btn-outline';
+    logoutBtn.id = 'logout-btn';
+    logoutBtn.textContent = 'Logout';
+    logoutBtn.addEventListener('click', () => {
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+      window.location.reload();
+    });
+    userActions.appendChild(logoutBtn);
   }
-  if (e.target === registerModal) {
-    registerModal.classList.remove('active');
-  }
-});
-
-// Login form handler
-const loginForm = document.getElementById('login-form');
-loginForm.addEventListener('submit', (e) => {
-  e.preventDefault();
-  const email = document.getElementById('login-email').value.trim();
-  const password = document.getElementById('login-password').value;
-
-  const users = JSON.parse(localStorage.getItem('users')) || [];
-  const user = users.find(u => u.email === email && u.password === password);
-
-  if (user) {
-    localStorage.setItem('currentUser ', JSON.stringify(user));
-    alert('Login berhasil!');
-    loginModal.classList.remove('active');
-    loginForm.reset();
-    // Bisa reload halaman atau redirect ke dashboard
-  } else {
-    alert('Email atau password salah!');
-  }
-});
-
-// Register form handler
-const registerForm = document.getElementById('register-form');
-registerForm.addEventListener('submit', (e) => {
-  e.preventDefault();
-  const name = document.getElementById('register-name').value.trim();
-  const email = document.getElementById('register-email').value.trim();
-  const password = document.getElementById('register-password').value;
-  const confirm = document.getElementById('register-confirm').value;
-
-  if (password !== confirm) {
-    alert('Password dan konfirmasi password tidak cocok!');
-    return;
-  }
-
-  const users = JSON.parse(localStorage.getItem('users')) || [];
-
-  if (users.some(user => user.email === email)) {
-    alert('Email sudah terdaftar!');
-    return;
-  }
-
-  const newUser  = {
-    id: Date.now(),
-    name,
-    email,
-    password,
-    avatar: name.charAt(0).toUpperCase()
-  };
-
-  users.push(newUser );
-  localStorage.setItem('users', JSON.stringify(users));
-  localStorage.setItem('currentUser ', JSON.stringify(newUser ));
-
-  alert('Pendaftaran berhasil! Selamat datang di Fokus.com');
-  registerModal.classList.remove('active');
-  registerForm.reset();
-  // Bisa reload halaman atau redirect ke dashboard
 });

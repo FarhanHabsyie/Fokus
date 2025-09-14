@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Fokus.com - Berita Kategori</title>
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+  <header>
+    <div class="container">
+      <div class="header-top">
+        <a href="index.html" class="logo">FOKUS.COM</a>
+        <div class="date-display" id="current-date"></div>
+      </div>
+      <div class="header-main">
+        <nav class="main-nav">
+          <ul>
+            <li><a href="index.html">Home</a></li>
+            <li><a href="category.html?category=News">News</a></li>
+            <li><a href="category.html?category=Ekonomi">Ekonomi</a></li>
+            <li><a href="category.html?category=Olahraga">Olahraga</a></li>
+            <li><a href="category.html?category=Teknologi">Teknologi</a></li>
+            <li><a href="category.html?category=Hiburan">Hiburan</a></li>
+            <li><a href="category.html?category=Lifestyle">Lifestyle</a></li>
+          </ul>
+        </nav>
+        <div class="search-login">
+          <form class="search-form">
+            <input type="text" class="search-input" placeholder="Cari berita..." />
+            <button type="submit" class="search-btn">🔍</button>
+          </form>
+          <div class="user-actions">
+            <button class="btn btn-outline" id="login-btn">Login</button>
+            <button class="btn btn-primary" id="register-btn">Daftar</button>
+            <a href="dashboard.html" class="btn btn-secondary" id="admin-btn" style="display: none;">Admin</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <h1 id="category-title"></h1>
+    <section class="news-section">
+      </section>
+  </main>
+
+  <footer>
+    <div class="container">
+      </div>
+  </footer>
+
+  <script src="js/utils.js"></script>
+  <script src="js/category.js"></script>
+</body>
+</html>

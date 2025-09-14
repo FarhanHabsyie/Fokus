@@ -7,7 +7,6 @@
   <link rel="stylesheet" href="css/styles.css" />
 </head>
 <body>
-  <!-- Header -->
   <header>
     <div class="container">
       <div class="header-top">
@@ -17,13 +16,13 @@
       <div class="header-main">
         <nav class="main-nav">
           <ul>
-            <li><a href="#">Home</a></li>
-            <li><a href="#">News</a></li>
-            <li><a href="#">Ekonomi</a></li>
-            <li><a href="#">Olahraga</a></li>
-            <li><a href="#">Teknologi</a></li>
-            <li><a href="#">Hiburan</a></li>
-            <li><a href="#">Lifestyle</a></li>
+            <li><a href="index.html">Home</a></li>
+            <li><a href="category.html?category=News">News</a></li>
+            <li><a href="category.html?category=Ekonomi">Ekonomi</a></li>
+            <li><a href="category.html?category=Olahraga">Olahraga</a></li>
+            <li><a href="category.html?category=Teknologi">Teknologi</a></li>
+            <li><a href="category.html?category=Hiburan">Hiburan</a></li>
+            <li><a href="category.html?category=Lifestyle">Lifestyle</a></li>
           </ul>
         </nav>
         <div class="search-login">
@@ -34,13 +33,13 @@
           <div class="user-actions">
             <button class="btn btn-outline" id="login-btn">Login</button>
             <button class="btn btn-primary" id="register-btn">Daftar</button>
+            <a href="dashboard.html" class="btn btn-secondary" id="admin-btn" style="display: none;">Admin</a>
           </div>
         </div>
       </div>
     </div>
   </header>
 
-  <!-- Hero Section -->
   <section class="hero container">
     <div class="breaking-news">
       <div class="breaking-label">BREAKING NEWS:</div>
@@ -50,22 +49,16 @@
         </div>
       </div>
     </div>
-    <!-- Hero grid and other content here (omitted for brevity) -->
-  </section>
+    </section>
 
-  <!-- News Section -->
   <section class="news-section container">
-    <!-- News cards here (omitted for brevity) -->
-  </section>
+    </section>
 
-  <!-- Footer -->
   <footer>
     <div class="container">
-      <!-- Footer content here (omitted for brevity) -->
-    </div>
+      </div>
   </footer>
 
-  <!-- Login Modal -->
   <div class="modal" id="login-modal">
     <div class="modal-content">
       <button class="modal-close" id="login-close">&times;</button>
@@ -90,7 +83,6 @@
     </div>
   </div>
 
-  <!-- Register Modal -->
   <div class="modal" id="register-modal">
     <div class="modal-content">
       <button class="modal-close" id="register-close">&times;</button>
@@ -126,4 +118,3 @@
   <script src="js/main.js"></script>
 </body>
 </html>
-

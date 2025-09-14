@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Fokus.com - Berita Terkini Indonesia</title>
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+  <!-- Header -->
+  <header>
+    <div class="container">
+      <div class="header-top">
+        <a href="index.html" class="logo">FOKUS.COM</a>
+        <div class="date-display" id="current-date"></div>
+      </div>
+      <div class="header-main">
+        <nav class="main-nav">
+          <ul>
+            <li><a href="#">Home</a></li>
+            <li><a href="#">News</a></li>
+            <li><a href="#">Ekonomi</a></li>
+            <li><a href="#">Olahraga</a></li>
+            <li><a href="#">Teknologi</a></li>
+            <li><a href="#">Hiburan</a></li>
+            <li><a href="#">Lifestyle</a></li>
+          </ul>
+        </nav>
+        <div class="search-login">
+          <form class="search-form">
+            <input type="text" class="search-input" placeholder="Cari berita..." />
+            <button type="submit" class="search-btn">🔍</button>
+          </form>
+          <div class="user-actions">
+            <button class="btn btn-outline" id="login-btn">Login</button>
+            <button class="btn btn-primary" id="register-btn">Daftar</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="hero container">
+    <div class="breaking-news">
+      <div class="breaking-label">BREAKING NEWS:</div>
+      <div class="breaking-content">
+        <div class="breaking-text" id="breaking-text">
+          Presiden Jokowi resmikan jalan tol baru di Jawa Barat yang akan mengurangi kemacetan ibukota hingga 30%.
+        </div>
+      </div>
+    </div>
+    <!-- Hero grid and other content here (omitted for brevity) -->
+  </section>
+
+  <!-- News Section -->
+  <section class="news-section container">
+    <!-- News cards here (omitted for brevity) -->
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <div class="container">
+      <!-- Footer content here (omitted for brevity) -->
+    </div>
+  </footer>
+
+  <!-- Login Modal -->
+  <div class="modal" id="login-modal">
+    <div class="modal-content">
+      <button class="modal-close" id="login-close">&times;</button>
+      <h2 class="modal-title">Login</h2>
+      <form id="login-form">
+        <div class="form-group">
+          <label for="login-email">Email</label>
+          <input type="email" class="form-control" id="login-email" required />
+        </div>
+        <div class="form-group">
+          <label for="login-password">Password</label>
+          <input type="password" class="form-control" id="login-password" required />
+        </div>
+        <button type="submit" class="btn btn-primary" style="width: 100%;">Login</button>
+        <div class="form-text text-center">
+          <a href="#" id="forgot-password">Lupa password?</a>
+        </div>
+        <div class="form-switch">
+          Belum punya akun? <a href="#" id="switch-to-register">Daftar di sini</a>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Register Modal -->
+  <div class="modal" id="register-modal">
+    <div class="modal-content">
+      <button class="modal-close" id="register-close">&times;</button>
+      <h2 class="modal-title">Daftar Akun</h2>
+      <form id="register-form">
+        <div class="form-group">
+          <label for="register-name">Nama Lengkap</label>
+          <input type="text" class="form-control" id="register-name" required />
+        </div>
+        <div class="form-group">
+          <label for="register-email">Email</label>
+          <input type="email" class="form-control" id="register-email" required />
+        </div>
+        <div class="form-group">
+          <label for="register-password">Password</label>
+          <input type="password" class="form-control" id="register-password" required />
+          <div class="form-text">Minimal 8 karakter</div>
+        </div>
+        <div class="form-group">
+          <label for="register-confirm">Konfirmasi Password</label>
+          <input type="password" class="form-control" id="register-confirm" required />
+        </div>
+        <button type="submit" class="btn btn-primary" style="width: 100%;">Daftar</button>
+        <div class="form-switch">
+          Sudah punya akun? <a href="#" id="switch-to-login">Login di sini</a>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="js/utils.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>
+

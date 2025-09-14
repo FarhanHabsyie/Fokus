@@ -1,91 +1,97 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Dashboard - Fokus.com</title>
-  <link rel="stylesheet" href="css/styles.css" />
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin Dashboard - Fokus.com</title>
+    <link rel="stylesheet" href="css/styles.css" />
 </head>
 <body>
-  <!-- Dashboard Header -->
-  <header class="dashboard-header">
-    <div class="container">
-      <div class="dashboard-nav">
-        <ul>
-          <li><a href="index.html">Home</a></li>
-          <li><a href="#" class="active">Dashboard</a></li>
-          <li><a href="#">Buat Berita</a></li>
-          <li><a href="#">Kelola Berita</a></li>
-          <li><a href="#">Profil</a></li>
-        </ul>
-        <div class="welcome-user">
-          <div class="user-avatar" id="user-avatar">U</div>
-          <div>
-            <div>Halo, <span id="user-name">User </span></div>
-            <a href="#" id="logout-btn">Logout</a>
-          </div>
+    <header>
+        <div class="container">
+            <a href="index.html" class="logo">FOKUS.COM - ADMIN</a>
         </div>
-      </div>
-    </div>
-  </header>
+    </header>
 
-  <div class="container">
-    <!-- Form Buat Berita Baru -->
-    <div class="news-form">
-      <h2>Buat Berita Baru</h2>
-      <form id="create-news-form">
-        <div class="form-group">
-          <label for="news-title">Judul Berita</label>
-          <input type="text" class="form-control" id="news-title" required />
+    <main class="container">
+        <h1>Dasbor Admin</h1>
+        <p>Selamat datang, <span id="user-name">Admin</span>!</p>
+
+        <section class="dashboard-section">
+            <h2>Buat Berita Baru</h2>
+            <form id="create-post-form">
+                <div class="form-group">
+                    <label for="post-title">Judul Berita</label>
+                    <input type="text" class="form-control" id="post-title" required />
+                </div>
+                <div class="form-group">
+                    <label for="post-image">Foto Berita</label>
+                    <input type="file" class="form-control" id="post-image" accept="image/*" required />
+                </div>
+                <div class="form-group">
+                    <label for="post-category">Kategori</label>
+                    <select class="form-control" id="post-category" required>
+                        <option value="" disabled selected>Pilih Kategori...</option>
+                        <option value="News">News</option>
+                        <option value="Ekonomi">Ekonomi</option>
+                        <option value="Olahraga">Olahraga</option>
+                        <option value="Teknologi">Teknologi</option>
+                        <option value="Hiburan">Hiburan</option>
+                        <option value="Lifestyle">Lifestyle</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="post-content">Isi Berita</label>
+                    <textarea class="form-control" id="post-content" rows="10" required></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary">Terbitkan</button>
+            </form>
+        </section>
+
+        <section class="dashboard-section">
+            <h2>Daftar Berita</h2>
+            <div id="post-list" class="post-list-table">
+                </div>
+        </section>
+    </main>
+
+    <div class="modal" id="edit-modal">
+        <div class="modal-content">
+            <button class="modal-close" id="edit-close">&times;</button>
+            <h2 class="modal-title">Edit Berita</h2>
+            <form id="edit-post-form">
+                <input type="hidden" id="edit-post-id" />
+                <input type="hidden" id="edit-existing-image-url" />
+                <div class="form-group">
+                    <label for="edit-post-title">Judul Berita</label>
+                    <input type="text" class="form-control" id="edit-post-title" required />
+                </div>
+                <div class="form-group">
+                    <label>Foto Saat Ini</label>
+                    <img id="edit-image-preview" src="" alt="Preview Gambar" style="max-width: 100px; display: block; margin-bottom: 10px;">
+                    <label for="edit-post-image">Ganti Foto (Opsional)</label>
+                    <input type="file" class="form-control" id="edit-post-image" accept="image/*" />
+                </div>
+                <div class="form-group">
+                    <label for="edit-post-category">Kategori</label>
+                    <select class="form-control" id="edit-post-category" required>
+                        <option value="News">News</option>
+                        <option value="Ekonomi">Ekonomi</option>
+                        <option value="Olahraga">Olahraga</option>
+                        <option value="Teknologi">Teknologi</option>
+                        <option value="Hiburan">Hiburan</option>
+                        <option value="Lifestyle">Lifestyle</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="edit-post-content">Isi Berita</label>
+                    <textarea class="form-control" id="edit-post-content" rows="10" required></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary">Simpan Perubahan</button>
+            </form>
         </div>
-        <div class="form-group">
-          <label for="news-category">Kategori</label>
-          <select class="form-control" id="news-category" required>
-            <option value="">Pilih Kategori</option>
-            <option value="news">News</option>
-            <option value="ekonomi">Ekonomi</option>
-            <option value="olahraga">Olahraga</option>
-            <option value="teknologi">Teknologi</option>
-            <option value="hiburan">Hiburan</option>
-            <option value="lifestyle">Lifestyle</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label for="news-image">URL Gambar</label>
-          <input type="url" class="form-control" id="news-image" placeholder="https://example.com/image.jpg" />
-        </div>
-        <div class="form-group">
-          <label for="news-content">Isi Berita</label>
-          <textarea class="form-control" id="news-content" rows="8" required></textarea>
-        </div>
-        <div class="form-actions">
-          <button type="button" class="btn btn-outline" id="save-draft-btn">Simpan Draft</button>
-          <button type="submit" class="btn btn-primary">Publikasikan</button>
-        </div>
-      </form>
     </div>
 
-    <!-- Daftar Berita Saya -->
-    <div class="user-news">
-      <h2>Berita Saya</h2>
-      <table class="news-table">
-        <thead>
-          <tr>
-            <th>Judul</th>
-            <th>Kategori</th>
-            <th>Tanggal</th>
-            <th>Status</th>
-            <th>Aksi</th>
-          </tr>
-        </thead>
-        <tbody id="user-news-list">
-          <!-- Berita akan dimuat di sini -->
-        </tbody>
-      </table>
-    </div>
-  </div>
-
-  <script src="js/utils.js"></script>
-  <script src="js/dashboard.js"></script>
+    <script src="js/dashboard.js"></script>
 </body>
 </html>

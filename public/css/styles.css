@@ -660,4 +660,152 @@ footer {
         grid-template-columns: 1fr;
     }
 }
-  
+  /* Styling untuk Kartu Berita dengan Gambar */
+.news-card {
+    display: flex;
+    flex-direction: column;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    overflow: hidden;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.news-card-image {
+    width: 100%;
+    height: 220px;
+    object-fit: cover; /* Membuat gambar menutupi area tanpa distorsi */
+}
+
+.news-card-content {
+    padding: 1rem;
+}
+
+.news-card h3 a {
+    text-decoration: none;
+    color: #333;
+}
+
+.news-card h3 a:hover {
+    color: #007bff;
+}
+
+.post-meta {
+    font-size: 0.8rem;
+    color: #777;
+    margin-bottom: 0.5rem;
+}
+
+/* Styling untuk Kartu Berita */
+.news-card-link {
+    text-decoration: none;
+    color: inherit;
+    display: block;
+}
+
+/* Styling untuk Halaman Artikel Penuh */
+.post-full {
+    margin-top: 2rem;
+    margin-bottom: 2rem;
+}
+
+.post-title {
+    font-size: 2.5rem;
+    margin-bottom: 0.5rem;
+    line-height: 1.2;
+}
+
+.post-meta {
+    font-size: 0.9rem;
+    color: #555;
+    margin-bottom: 1.5rem;
+}
+
+.post-image-full {
+    width: 80%; /* Atur lebar gambar */
+    max-width: 700px; /* Batas lebar maksimum */
+    height: auto;
+    display: block; /* Agar margin auto berfungsi */
+    margin: 2rem auto; /* Ini akan membuat gambar berada di tengah */
+    border-radius: 5px;
+}
+
+.post-body {
+    font-size: 1.1rem;
+    line-height: 1.8;
+    color: #333;
+}
+
+/* Styling untuk Breaking News agar Full-Width */
+.breaking-news {
+    width: 100%; /* Membuatnya selebar layar */
+    background-color: #d9534f; /* Memberi warna latar belakang merah */
+    color: white;
+    padding: 10px 0; /* Memberi sedikit ruang di atas dan bawah */
+    box-sizing: border-box;
+}
+
+.breaking-news .container {
+    display: flex;
+    align-items: center;
+}
+
+/* Styling untuk menengahkan section berita */
+.news-section {
+    display: grid;
+    /* Membuat 3 kolom di layar besar, 2 di tablet, dan 1 di mobile */
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); 
+    gap: 20px; /* Jarak antar kartu berita */
+    justify-items: center; /* Menengahkan item di dalam grid */
+    padding-top: 2rem;
+}
+
+/* ... (kode CSS yang sudah ada) ... */
+
+/* Styling untuk Tabel di Dashboard */
+.post-list-table table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1rem;
+}
+
+.post-list-table th, .post-list-table td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+}
+
+.post-list-table th {
+    background-color: #f2f2f2;
+}
+
+.btn-sm {
+    padding: 5px 10px;
+    font-size: 0.8rem;
+    margin-right: 5px;
+}
+
+.btn-danger {
+    background-color: #d9534f;
+    color: white;
+    border: 1px solid #d43f3a;
+}
+
+.btn-danger:hover {
+    background-color: #c9302c;
+}
+
+/* ... (kode CSS yang sudah ada) ... */
+
+/* Perbaikan untuk Tautan Breaking News */
+#breaking-news-link {
+    text-decoration: none; /* Menghilangkan garis bawah */
+    color: white; /* Mewarisi warna teks dari parent */
+    display: flex; /* Memastikan tata letak tetap sama */
+    align-items: center;
+    transition: background-color 0.2s ease-in-out; /* Transisi halus */
+}
+
+#breaking-news-link:hover {
+    background-color: #c9302c; /* Warna sedikit lebih gelap saat disentuh mouse */
+}

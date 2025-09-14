@@ -1,101 +1,205 @@
 const express = require("express");
 const cors = require("cors");
 const dotenv = require("dotenv");
-const bcrypt = require("bcrypt");
-const jwt = require("jsonwebtoken");
-const db = require("./db");
-const path = require("path");   // <-- tambah ini
+const multer = require("multer");
+const path = require("path");
+const supabase = require('./supabaseClient'); // Impor klien Supabase
 
 dotenv.config();
 const app = express();
 app.use(cors());
 app.use(express.json());
 
-const JWT_SECRET = process.env.JWT_SECRET || "dev_secret";
+// Konfigurasi Multer untuk menangani upload di memori
+const storage = multer.memoryStorage();
+const upload = multer({ storage: storage });
 
-// 🔥 serve frontend dari folder ../public
+// Serve frontend
 app.use(express.static(path.join(__dirname, "../public")));
 
-app.get("/", (req, res) => {
-  res.sendFile(path.join(__dirname, "../public/index.html"));
-});
+// ======================
+// AUTH & API ENDPOINTS (Versi Supabase)
+// ======================
 
-// ======================
-// AUTH & API ENDPOINTS
-// ======================
+// Middleware untuk mendapatkan user dari token
+const requireAuth = async (req, res, next) => {
+    const { authorization } = req.headers;
+    if (!authorization) {
+        return res.status(401).json({ error: 'Token otorisasi diperlukan' });
+    }
+    const token = authorization.split(' ')[1];
+
+    const { data: { user }, error } = await supabase.auth.getUser(token);
+
+    if (error) {
+        return res.status(401).json({ error: 'Token tidak valid' });
+    }
+    req.user = user;
+    next();
+};
 
 // Register
-app.post("/register", (req, res) => {
-  const { email, password, name } = req.body;
-  if (!email || !password)
-    return res.status(400).json({ error: "Email & password wajib" });
+app.post("/register", async (req, res) => {
+    const { email, password, name } = req.body;
+    const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+            data: {
+                full_name: name
+            }
+        }
+    });
 
-  bcrypt.hash(password, 10, (err, hash) => {
-    if (err) return res.status(500).json({ error: "Error hashing" });
-    db.run(
-      "INSERT INTO users (email, password, name) VALUES (?,?,?)",
-      [email, hash, name || ""],
-      function (err) {
-        if (err) return res.status(400).json({ error: "Email sudah dipakai" });
-        const token = jwt.sign({ userId: this.lastID }, JWT_SECRET, {
-          expiresIn: "7d",
-        });
-        res.json({ id: this.lastID, email, name, token });
-      }
-    );
-  });
+    if (error) return res.status(400).json({ error: error.message });
+    res.json({ message: 'Registrasi berhasil! Cek email untuk verifikasi.', data });
 });
 
 // Login
-app.post("/login", (req, res) => {
-  const { email, password } = req.body;
-  db.get("SELECT * FROM users WHERE email = ?", [email], (err, user) => {
-    if (!user) return res.status(401).json({ error: "Invalid credentials" });
-    bcrypt.compare(password, user.password, (err, same) => {
-      if (!same) return res.status(401).json({ error: "Invalid credentials" });
-      const token = jwt.sign({ userId: user.id }, JWT_SECRET, {
-        expiresIn: "7d",
-      });
-      res.json({ id: user.id, email: user.email, name: user.name, token });
+app.post("/login", async (req, res) => {
+    const { email, password } = req.body;
+    const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
     });
-  });
+
+    if (error) return res.status(401).json({ error: error.message });
+    res.json(data);
 });
 
-// Middleware cek login
-function requireAuth(req, res, next) {
-  const auth = req.headers.authorization;
-  if (!auth) return res.status(401).json({ error: "No token" });
-  try {
-    const { userId } = jwt.verify(auth.split(" ")[1], JWT_SECRET);
-    req.userId = userId;
-    next();
-  } catch {
-    res.status(401).json({ error: "Invalid token" });
-  }
-}
+// Forgot Password
+app.post('/forgot-password', async (req, res) => {
+    const { email } = req.body;
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: 'http://localhost:4000/reset-password.html',
+    });
 
-// Get posts
-app.get("/posts", (req, res) => {
-  db.all("SELECT * FROM posts ORDER BY id DESC", [], (err, rows) => {
-    res.json(rows);
-  });
+    if (error) {
+        // Jangan beri tahu jika email tidak ada, demi keamanan
+        console.error("Error reset password:", error.message);
+    }
+    res.json({ message: 'Jika email terdaftar, tautan reset telah dikirim.' });
+});
+
+// Update Password (saat user sudah login atau setelah reset)
+app.post('/update-password', requireAuth, async (req, res) => {
+    const { password } = req.body;
+    const { error } = await supabase.auth.updateUser({ password });
+
+    if (error) return res.status(400).json({ error: error.message });
+    res.json({ message: 'Password berhasil diperbarui.' });
+});
+
+
+// ======================
+// POSTS API (Versi Supabase)
+// ======================
+
+// Get all posts
+app.get("/posts", async (req, res) => {
+    let query = supabase.from('posts').select(`
+        id, title, content, category, imageUrl, createdAt,
+        author:users ( name )
+    `).order('createdAt', { ascending: false });
+
+    if (req.query.category) {
+        query = query.eq('category', req.query.category);
+    }
+
+    const { data, error } = await query;
+    if (error) return res.status(500).json({ error: error.message });
+    res.json(data);
+});
+
+// Get single post
+app.get("/posts/:id", async (req, res) => {
+    const { id } = req.params;
+    const { data, error } = await supabase
+        .from('posts')
+        .select(`*, author:users ( name )`)
+        .eq('id', id)
+        .single();
+        
+    if (error) return res.status(404).json({ error: 'Berita tidak ditemukan' });
+    res.json(data);
 });
 
 // Create post
-app.post("/posts", requireAuth, (req, res) => {
-  const { title, content } = req.body;
-  db.run(
-    "INSERT INTO posts (title, content, authorId) VALUES (?,?,?)",
-    [title, content, req.userId],
-    function (err) {
-      if (err) return res.status(500).json({ error: "Insert failed" });
-      res.json({ id: this.lastID, title, content });
+app.post("/posts", requireAuth, upload.single('image'), async (req, res) => {
+    const { title, content, category } = req.body;
+
+    if (!req.file) {
+        return res.status(400).json({ error: "Foto berita wajib diunggah." });
     }
-  );
+
+    const fileName = `${Date.now()}-${req.file.originalname}`;
+    
+    // Upload gambar ke Supabase Storage
+    const { data: uploadData, error: uploadError } = await supabase.storage
+        .from('post-images') // Nama bucket Anda
+        .upload(fileName, req.file.buffer, {
+            contentType: req.file.mimetype,
+        });
+
+    if (uploadError) {
+        return res.status(500).json({ error: 'Gagal mengunggah gambar.' });
+    }
+
+    // Dapatkan URL publik dari gambar yang diunggah
+    const { data: { publicUrl } } = supabase.storage
+        .from('post-images')
+        .getPublicUrl(fileName);
+
+    // Simpan post ke database
+    const { data: postData, error: postError } = await supabase
+        .from('posts')
+        .insert([{ 
+            title, 
+            content, 
+            category, 
+            imageUrl: publicUrl,
+            authorId: req.user.id 
+        }]);
+    
+    if (postError) return res.status(500).json({ error: postError.message });
+    res.status(201).json(postData);
+});
+
+// Update post
+app.put("/posts/:id", requireAuth, upload.single('image'), async (req, res) => {
+    // Implementasi update dengan cek hak akses (seperti di delete)
+    res.status(501).json({ message: "Update belum diimplementasikan" });
+});
+
+// Delete post
+app.delete("/posts/:id", requireAuth, async (req, res) => {
+    const { id } = req.params;
+
+    // Cek kepemilikan
+    const { data: post, error: fetchError } = await supabase
+        .from('posts')
+        .select('authorId, imageUrl')
+        .eq('id', id)
+        .single();
+
+    if (fetchError || !post) return res.status(404).json({ error: "Post tidak ditemukan." });
+
+    if (post.authorId !== req.user.id) {
+        return res.status(403).json({ error: "Anda tidak punya izin untuk menghapus post ini." });
+    }
+
+    // Hapus gambar dari storage
+    const fileName = post.imageUrl.split('/').pop();
+    await supabase.storage.from('post-images').remove([fileName]);
+
+    // Hapus post dari database
+    const { error: deleteError } = await supabase.from('posts').delete().eq('id', id);
+
+    if (deleteError) return res.status(500).json({ error: deleteError.message });
+    res.json({ message: "Post berhasil dihapus" });
 });
 
 const PORT = process.env.PORT || 4000;
 app.listen(PORT, () =>
   console.log(`Server jalan di http://localhost:${PORT}`)
 );
-

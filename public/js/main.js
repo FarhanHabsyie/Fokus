@@ -16,7 +16,7 @@ function updateDate() {
         const { data, error } = await supabase
           .from('posts')
           .select('id, title')
-          .order('createdAt', { ascending: false })
+          .order('created_at', { ascending: false })
           .limit(1)
           .single();
         
@@ -57,7 +57,7 @@ function updateDate() {
         postElement.className = 'news-card';
   
         const snippet = post.content ? post.content.substring(0, 100) + '...' : '';
-        const postDate = new Date(post.createdAt).toLocaleDateString('id-ID', {
+        const postDate = new Date(post.created_at).toLocaleDateString('id-ID', {
             day: 'numeric', month: 'long', year: 'numeric'
         });
   
@@ -89,7 +89,7 @@ function updateDate() {
               *,
               users ( name )
           `)
-          .order('createdAt', { ascending: false });
+          .order('created_at', { ascending: false });
   
         if (error) throw error;
         displayPosts(data);

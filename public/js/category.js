@@ -13,7 +13,7 @@ function displayPosts(posts) {
         postElement.className = 'news-card';
 
         const snippet = post.content.substring(0, 100) + '...';
-        const postDate = new Date(post.createdAt).toLocaleDateString('id-ID', {
+        const postDate = new Date(post.created_at).toLocaleDateString('id-ID', {
             day: 'numeric', month: 'long', year: 'numeric'
         });
         
@@ -43,7 +43,7 @@ async function loadPostsByCategory(category) {
           .from('posts')
           .select(`*, users ( name )`)
           .eq('category', category)
-          .order('createdAt', { ascending: false });
+          .order('created_at', { ascending: false });
 
         if (error) throw error;
         displayPosts(data);

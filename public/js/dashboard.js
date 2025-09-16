@@ -21,8 +21,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         try {
             const { data: posts, error } = await supabase
               .from('posts')
-              .select('id, title, category, createdAt, authorId')
-              .order('createdAt', { ascending: false });
+              .select('id, title, category, created_at, author_id')
+              .order('created_at', { ascending: false });
   
             if (error) throw error;
             
@@ -41,10 +41,10 @@ document.addEventListener('DOMContentLoaded', async () => {
                             <tr>
                                 <td>${post.title}</td>
                                 <td>${post.category}</td>
-                                <td>${new Date(post.createdAt).toLocaleDateString('id-ID')}</td>
+                                <td>${new Date(post.created_at).toLocaleDateString('id-ID')}</td>
                                 <td>
                                     ${
-                                      post.authorId === user.id
+                                      post.author_id === user.id
                                         ? `
                                     <button class="btn btn-sm btn-outline btn-edit" data-id="${post.id}">Edit</button>
                                     <button class="btn btn-sm btn-danger btn-delete" data-id="${post.id}">Hapus</button>
@@ -125,7 +125,7 @@ document.addEventListener('DOMContentLoaded', async () => {
           // Ambil URL gambar sebelum menghapus post
           const { data: post, error: fetchError } = await supabase
               .from('posts')
-              .select('imageUrl')
+              .select('image_url')
               .eq('id', postId)
               .single();
   
@@ -136,7 +136,7 @@ document.addEventListener('DOMContentLoaded', async () => {
           if (deleteError) throw deleteError;
   
           // Hapus gambar dari storage
-          const fileName = post.imageUrl.split('/').pop();
+          const fileName = post.image_url.split('/').pop();
           await supabase.storage.from('post-images').remove([fileName]);
   
           alert('Berita berhasil dihapus.');

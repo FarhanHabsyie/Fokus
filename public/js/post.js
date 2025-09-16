@@ -20,7 +20,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             document.title = `${post.title} - Fokus.com`;
 
-            const postDate = new Date(post.createdAt).toLocaleDateString('id-ID', {
+            const postDate = new Date(post.created_at).toLocaleDateString('id-ID', {
                 day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit'
             });
 

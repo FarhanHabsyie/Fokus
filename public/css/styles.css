@@ -8,7 +8,7 @@
   
   /* Variables */
   :root {
-    --primary-color: #eb7ae1;
+    --primary-color: #c92ebc;
     --secondary-color: #3182ce;
     --dark-color: #2d3748;
     --light-color: #f7fafc;
@@ -739,7 +739,7 @@ footer {
 /* Styling untuk Breaking News agar Full-Width */
 .breaking-news {
     width: 100%; /* Membuatnya selebar layar */
-    background-color: #d9534f; /* Memberi warna latar belakang merah */
+    background-color: #000269; /* Memberi warna latar belakang merah */
     color: white;
     padding: 10px 0; /* Memberi sedikit ruang di atas dan bawah */
     box-sizing: border-box;
@@ -807,5 +807,5 @@ footer {
 }
 
 #breaking-news-link:hover {
-    background-color: #c9302c; /* Warna sedikit lebih gelap saat disentuh mouse */
+    background-color: #03009e; /* Warna sedikit lebih gelap saat disentuh mouse */
 }

@@ -104,9 +104,9 @@ app.post('/update-password', requireAuth, async (req, res) => {
 // Get all posts
 app.get("/posts", async (req, res) => {
     let query = supabase.from('posts').select(`
-        id, title, content, category, imageUrl, createdAt,
+        id, title, content, category, image_url, created_at,
         author:profiles ( name )
-    `).order('createdAt', { ascending: false });
+    `).order('created_at', { ascending: false });
 
     if (req.query.category) {
         query = query.eq('category', req.query.category);
@@ -165,8 +165,8 @@ app.post("/posts", requireAuth, upload.single('image'), async (req, res) => {
             title, 
             content, 
             category, 
-            imageUrl: publicUrl,
-            authorId: req.user.id 
+            image_url: publicUrl,
+            author_id: req.user.id 
         }]);
     
     if (postError) return res.status(500).json({ error: postError.message });
@@ -186,18 +186,18 @@ app.delete("/posts/:id", requireAuth, async (req, res) => {
     // Cek kepemilikan
     const { data: post, error: fetchError } = await supabase
         .from('posts')
-        .select('authorId, imageUrl')
+        .select('author_id, image_url')
         .eq('id', id)
         .single();
 
     if (fetchError || !post) return res.status(404).json({ error: "Post tidak ditemukan." });
 
-    if (post.authorId !== req.user.id) {
+    if (post.author_id !== req.user.id) {
         return res.status(403).json({ error: "Anda tidak punya izin untuk menghapus post ini." });
     }
 
     // Hapus gambar dari storage
-    const fileName = post.imageUrl.split('/').pop();
+    const fileName = post.image_irl.split('/').pop();
     await supabase.storage.from('post-images').remove([fileName]);
 
     // Hapus post dari database

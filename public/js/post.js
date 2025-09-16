@@ -10,10 +10,13 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         try {
-            const response = await fetch(`http://localhost:4000/posts/${id}`);
-            if (!response.ok) throw new Error('Berita tidak dapat dimuat.');
+            const { data: post, error } = await supabase
+                .from('posts')
+                .select(`*, users ( name )`)
+                .eq('id', id)
+                .single();
             
-            const post = await response.json();
+            if (error) throw error;
 
             document.title = `${post.title} - Fokus.com`;
 
@@ -21,8 +24,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit'
             });
 
-            // PERUBAHAN: Mengakses nama penulis dari objek bersarang
-            const authorName = post.author ? post.author.name : 'Penulis Anonim';
+            // Mengambil nama penulis dari relasi 'users'
+            const authorName = post.users ? post.users.name : 'Penulis Anonim';
 
             postContentArea.innerHTML = `
                 <h1 class="post-title">${post.title}</h1>
@@ -31,12 +34,13 @@ document.addEventListener('DOMContentLoaded', () => {
                     <span>${postDate} WIB</span> | 
                     <span>Kategori: <strong>${post.category}</strong></span>
                 </div>
-                <img src="${post.imageUrl}" alt="${post.title}" class="post-image-full">
+                <img src="${post.image_url}" alt="${post.title}" class="post-image-full">
                 <div class="post-body">
                     ${post.content.replace(/\n/g, '<br>')}
                 </div>
             `;
         } catch (error) {
+            console.error('Gagal memuat post:', error);
             postContentArea.innerHTML = `<h2>Terjadi kesalahan saat memuat berita.</h2>`;
         }
     }

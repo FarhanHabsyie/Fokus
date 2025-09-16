@@ -52,10 +52,10 @@
   </div>
 
   <section class="hero container">
-    </section>
+  </section>
 
   <section class="news-section container">
-    </section>
+  </section>
 
   <footer>
     <div class="container">
@@ -116,8 +116,19 @@
     </div>
   </div>
 
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+  
+  <script>
+    const { createClient } = supabase;
+    window.supabase = createClient(
+      'https://ppmbksnakhndovwovjks.supabase.co',
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBwbWJrc25ha2huZG92d292amtzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc4ODA1MjcsImV4cCI6MjA3MzQ1NjUyN30.ZPpHhNWZgvuQFqV92AiP9YBvdmVtMSqyj1ZjEKoDssc'
+    );
+  </script>
+
   <script src="js/utils.js"></script>
   <script src="js/auth.js"></script>
   <script src="js/main.js"></script>
-</body>
+  
+  </body>
 </html>

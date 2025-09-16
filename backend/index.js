@@ -4,6 +4,10 @@ const dotenv = require("dotenv");
 const multer = require("multer");
 const path = require("path");
 const supabase = require('./supabaseClient'); // Impor klien Supabase
+// ... baris kode sebelumnya
+
+console.log('Mencoba terhubung ke Supabase URL:', process.env.SUPABASE_URL); // <-- TAMBAHKAN BARIS INI
+// ... sisa kode
 
 dotenv.config();
 const app = express();
@@ -13,6 +17,8 @@ app.use(express.json());
 // Konfigurasi Multer untuk menangani upload di memori
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
+
+
 
 // Serve frontend
 app.use(express.static(path.join(__dirname, "../public")));
@@ -99,7 +105,7 @@ app.post('/update-password', requireAuth, async (req, res) => {
 app.get("/posts", async (req, res) => {
     let query = supabase.from('posts').select(`
         id, title, content, category, imageUrl, createdAt,
-        author:users ( name )
+        author:profiles ( name )
     `).order('createdAt', { ascending: false });
 
     if (req.query.category) {
@@ -146,9 +152,11 @@ app.post("/posts", requireAuth, upload.single('image'), async (req, res) => {
     }
 
     // Dapatkan URL publik dari gambar yang diunggah
-    const { data: { publicUrl } } = supabase.storage
-        .from('post-images')
-        .getPublicUrl(fileName);
+    const { data } = supabase.storage
+    .from('post-images')
+    .getPublicUrl(fileName);
+
+    const publicUrl = data.publicUrl;
 
     // Simpan post ke database
     const { data: postData, error: postError } = await supabase
@@ -199,7 +207,8 @@ app.delete("/posts/:id", requireAuth, async (req, res) => {
     res.json({ message: "Post berhasil dihapus" });
 });
 
-const PORT = process.env.PORT || 4000;
+
+const PORT = process.env.PORT || 3000;
 app.listen(PORT, () =>
   console.log(`Server jalan di http://localhost:${PORT}`)
 );

@@ -18,22 +18,22 @@ document.addEventListener('DOMContentLoaded', () => {
   const registerForm = document.getElementById('register-form');
 
   // === Fungsi untuk mengelola status UI berdasarkan Sesi Supabase ===
-  function updateUIBasedOnLoginState() {
-    const session = localStorage.getItem('supabase.auth.token'); // Kunci default Supabase
-    if (session) {
+  function updateUIBasedOnLoginState(user) {
+    if (user) {
       // Pengguna sudah login
       loginBtn.style.display = 'none';
       registerBtn.style.display = 'none';
       adminBtn.style.display = 'inline-block';
 
+      // Tambahkan tombol logout jika belum ada
       if (!document.getElementById('logout-btn')) {
         const logoutBtn = document.createElement('button');
         logoutBtn.className = 'btn btn-outline';
         logoutBtn.id = 'logout-btn';
         logoutBtn.textContent = 'Logout';
-        logoutBtn.addEventListener('click', () => {
-          localStorage.removeItem('supabase.auth.token'); // Hapus sesi Supabase
-          window.location.reload();
+        logoutBtn.addEventListener('click', async () => {
+          await supabase.auth.signOut();
+          window.location.reload(); // Muat ulang halaman setelah logout
         });
         userActions.appendChild(logoutBtn);
       }
@@ -51,26 +51,26 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // === Event Listeners untuk Modal ===
-  loginBtn.addEventListener('click', () => loginModal.style.display = 'block');
-  registerBtn.addEventListener('click', () => registerModal.style.display = 'block');
+  loginBtn.addEventListener('click', () => loginModal.style.display = 'flex');
+  registerBtn.addEventListener('click', () => registerModal.style.display = 'flex');
   loginClose.addEventListener('click', () => loginModal.style.display = 'none');
-  registerClose.addEventListener('click', () => window.location.reload());
+  registerClose.addEventListener('click', () => registerModal.style.display = 'none');
 
   window.addEventListener('click', (event) => {
     if (event.target === loginModal) loginModal.style.display = 'none';
-    if (event.target === registerModal) window.location.reload();
+    if (event.target === registerModal) registerModal.style.display = 'none';
   });
 
   switchToRegister.addEventListener('click', (e) => {
     e.preventDefault();
     loginModal.style.display = 'none';
-    registerModal.style.display = 'block';
+    registerModal.style.display = 'flex';
   });
 
   switchToLogin.addEventListener('click', (e) => {
     e.preventDefault();
     registerModal.style.display = 'none';
-    loginModal.style.display = 'block';
+    loginModal.style.display = 'flex';
   });
 
   // === Event Listeners untuk Form (Versi Supabase) ===
@@ -81,26 +81,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const email = document.getElementById('login-email').value;
     const password = document.getElementById('login-password').value;
 
-    try {
-      const response = await fetch('http://localhost:4000/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password }),
-      });
+    const { error } = await supabase.auth.signInWithPassword({ email, password });
 
-      const data = await response.json();
-
-      if (response.ok) {
-        // Supabase mengembalikan objek session yang kompleks, kita simpan semuanya
-        localStorage.setItem('supabase.auth.token', JSON.stringify(data));
-        loginModal.style.display = 'none';
-        updateUIBasedOnLoginState();
-        window.location.reload(); // Muat ulang untuk memastikan semua state terbaru
-      } else {
-        alert(`Login gagal: ${data.error}`);
-      }
-    } catch (error) {
-      alert('Terjadi kesalahan. Silakan coba lagi.');
+    if (error) {
+      alert(`Login gagal: ${error.message}`);
+    } else {
+      loginModal.style.display = 'none';
+      window.location.reload();
     }
   });
 
@@ -117,17 +104,20 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
 
-    try {
-      const response = await fetch('http://localhost:4000/register', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, email, password }),
-      });
+    const { data, error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        data: {
+          full_name: name,
+        },
+      },
+    });
 
-      const data = await response.json();
-
-      if (response.ok) {
-        registerModal.innerHTML = `
+    if (error) {
+      alert(`Pendaftaran gagal: ${error.message}`);
+    } else {
+      registerModal.innerHTML = `
             <div class="modal-content">
                 <h2 class="modal-title">👍 Registrasi Berhasil!</h2>
                 <p style="text-align: center; line-height: 1.6;">
@@ -137,14 +127,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 </p>
             </div>
         `;
-      } else {
-        alert(`Pendaftaran gagal: ${data.error}`);
-      }
-    } catch (error) {
-      alert('Terjadi kesalahan. Silakan coba lagi.');
     }
   });
 
-  // === Inisialisasi ===
-  updateUIBasedOnLoginState();
+  // === Inisialisasi: Cek status login saat halaman dimuat ===
+  // Menggunakan onAuthStateChange agar UI selalu sinkron dengan status login
+  supabase.auth.onAuthStateChange((_event, session) => {
+    const user = session?.user;
+    updateUIBasedOnLoginState(user);
+  });
 });

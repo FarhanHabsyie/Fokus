@@ -1,9 +1,9 @@
-// Fungsi untuk menampilkan berita (sama seperti di main.js, bisa ditaruh di utils.js jika ingin)
+// Fungsi untuk menampilkan berita
 function displayPosts(posts) {
     const newsSection = document.querySelector('.news-section');
     newsSection.innerHTML = ''; // Kosongkan section
 
-    if (posts.length === 0) {
+    if (!posts || posts.length === 0) {
         newsSection.innerHTML = '<p>Belum ada berita dalam kategori ini.</p>';
         return;
     }
@@ -17,14 +17,16 @@ function displayPosts(posts) {
             day: 'numeric', month: 'long', year: 'numeric'
         });
         
-        // Diperbarui: Tambahkan tautan ke post.html dengan ID
+        // Mengambil nama penulis dari relasi 'users'
+        const authorName = (post.users && post.users.name) ? post.users.name : 'Penulis';
+        
         postElement.innerHTML = `
             <a href="post.html?id=${post.id}" class="news-card-link">
-                <img src="${post.imageUrl}" alt="${post.title}" class="news-card-image">
+                <img src="${post.image_url}" alt="${post.title}" class="news-card-image">
                 <div class="news-card-content">
                     <h3>${post.title}</h3>
                     <div class="post-meta">
-                        <span>Oleh: ${post.authorName}</span> | <span>${postDate}</span>
+                        <span>Oleh: ${authorName}</span> | <span>${postDate}</span>
                     </div>
                     <p>${snippet}</p>
                 </div>
@@ -37,16 +39,20 @@ function displayPosts(posts) {
 // Fungsi untuk memuat berita berdasarkan kategori
 async function loadPostsByCategory(category) {
     try {
-        const response = await fetch(`http://localhost:4000/posts?category=${category}`);
-        const posts = await response.json();
-        displayPosts(posts);
+        const { data, error } = await supabase
+          .from('posts')
+          .select(`*, users ( name )`)
+          .eq('category', category)
+          .order('createdAt', { ascending: false });
+
+        if (error) throw error;
+        displayPosts(data);
     } catch (error) {
         console.error('Gagal memuat berita:', error);
         const newsSection = document.querySelector('.news-section');
         newsSection.innerHTML = '<p>Gagal memuat berita. Silakan coba lagi nanti.</p>';
     }
 }
-
 
 document.addEventListener('DOMContentLoaded', () => {
   const urlParams = new URLSearchParams(window.location.search);

@@ -147,11 +147,103 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   
     // Event Delegation untuk tombol Edit & Delete
-    postList.addEventListener('click', (e) => {
+    postList.addEventListener('click', async (e) => {
         if (e.target.classList.contains('btn-delete')) {
             deletePost(e.target.dataset.id);
+        } else if (e.target.classList.contains('btn-edit')) {
+            const postId = e.target.dataset.id;
+            try {
+                const { data: post, error } = await supabase
+                    .from('posts')
+                    .select('*')
+                    .eq('id', postId)
+                    .single();
+
+                if (error) throw error;
+
+                // Populate the modal with the post data
+                document.getElementById('edit-post-id').value = post.id;
+                document.getElementById('edit-post-title').value = post.title;
+                document.getElementById('edit-post-content').value = post.content;
+                document.getElementById('edit-post-category').value = post.category;
+                document.getElementById('edit-existing-image-url').value = post.imageUrl;
+                document.getElementById('edit-image-preview').src = post.imageUrl;
+
+                // Show the modal
+                document.getElementById('edit-modal').style.display = 'block';
+            } catch (error) {
+                alert('Gagal memuat data berita untuk diedit: ' + error.message);
+            }
         }
-        // Tambahkan logika untuk 'btn-edit' di sini
+    });
+
+    // Close modal functionality
+    document.getElementById('edit-close').addEventListener('click', () => {
+        document.getElementById('edit-modal').style.display = 'none';
+    });
+  
+    // Handle edit post form submission
+    document.getElementById('edit-post-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const postId = document.getElementById('edit-post-id').value;
+        const title = document.getElementById('edit-post-title').value;
+        const content = document.getElementById('edit-post-content').value;
+        const category = document.getElementById('edit-post-category').value;
+        const existingImageUrl = document.getElementById('edit-existing-image-url').value;
+        const newImageFile = document.getElementById('edit-post-image').files[0];
+
+        let image_url = existingImageUrl;
+
+        try {
+            // If a new image is uploaded, replace the old one
+            if (newImageFile) {
+                const fileName = `${Date.now()}-${newImageFile.name}`;
+
+                // Upload the new image to Supabase Storage
+                const { data: uploadData, error: uploadError } = await supabase.storage
+                    .from('post-images')
+                    .upload(fileName, newImageFile);
+
+                if (uploadError) {
+                    alert('Gagal mengunggah gambar baru: ' + uploadError.message);
+                    return;
+                }
+
+                // Get the public URL of the new image
+                const { data: { publicUrl } } = supabase.storage
+                    .from('post-images')
+                    .getPublicUrl(fileName);
+
+                image_url = publicUrl;
+
+                // Remove the old image from storage
+                const oldFileName = existingImageUrl.split('/').pop();
+                await supabase.storage.from('post-images').remove([oldFileName]);
+            }
+
+            // Update the post in the database
+            const { error: updateError } = await supabase
+                .from('posts')
+                .update({
+                    title,
+                    content,
+                    category,
+                    image_url,
+                })
+                .eq('id', postId);
+
+            if (updateError) {
+                alert('Gagal memperbarui berita: ' + updateError.message);
+            } else {
+                alert('Berita berhasil diperbarui!');
+                document.getElementById('edit-post-form').reset();
+                document.getElementById('edit-modal').style.display = 'none';
+                loadPosts();
+            }
+        } catch (error) {
+            alert('Terjadi kesalahan saat memperbarui berita: ' + error.message);
+        }
     });
   
     loadPosts();

@@ -165,7 +165,7 @@ app.post("/posts", requireAuth, upload.single('image'), async (req, res) => {
             title, 
             content, 
             category, 
-            image_url: publicUrl,
+            image: publicUrl,
             author_id: req.user.id 
         }]);
     
